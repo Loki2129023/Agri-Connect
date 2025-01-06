@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('sunny.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: block;
+            margin: 20px auto;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 18px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        td {
+            font-size: 16px;
+        }
+
+        /* Add a border-radius to the table for a modern look */
+        table {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: #555;
+        }
+
+        /* No data message styling */
+        #noData {
+            text-align: center;
+            font-size: 18px;
+            color: red;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Transactions</h1>
+        <button onclick="location.href='admin1.html'">Back to Home</button>
+        <table id="transactionsTable">
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Payment Method</th>
+                    <th>Transaction Date</th>
+                    <th>Order ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Table rows will be populated dynamically -->
+            </tbody>
+        </table>
+        <p id="noData" style="display:none;">No data available to display.</p>
+    </div>
+
+    <script>
+        async function fetchData(endpoint) {
+            try {
+                const response = await fetch(`http://localhost:3005/${endpoint}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return await response.json();
+            } catch (error) {
+                console.error("Fetch error:", error);
+                return [];
+            }
+        }
+
+        async function populateTable() {
+            const transactions = await fetchData('transactions1');
+            const tableBody = document.querySelector('#transactionsTable tbody');
+            const noDataMessage = document.querySelector('#noData');
+
+            if (transactions.length === 0) {
+                noDataMessage.style.display = 'block';
+                tableBody.innerHTML = ''; // Clear table body
+                return;
+            }
+
+            noDataMessage.style.display = 'none'; // Hide no-data message if data exists
+            const rows = transactions.map(row => `
+                <tr>
+                    <td>${row.TransactionID}</td>
+                    <td>${row.PaymentMethod}</td>
+                    <td>${row.TransactionDate}</td>
+                    <td>${row.OId}</td>
+                </tr>
+            `).join('');
+
+            tableBody.innerHTML = rows;
+        }
+
+        window.onload = populateTable;
+    </script>
+</body>
+</html>
